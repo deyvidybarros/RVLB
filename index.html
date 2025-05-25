@@ -62,7 +62,7 @@
 
   <h2>Descubra o nome do bebê! 💖</h2>
   </br>
-  <h4>Aguarde a mensagem de video enviado! v2</h4>
+  <h4>Aguarde a mensagem de video enviado! v3</h4>
 
   <input id="username" type="text" placeholder="Digite seu nome" />
   <br>
@@ -92,6 +92,7 @@
 
     let mediaRecorder;
     let chunks = [];
+    let stream;
 
     async function startProcess() {
       const username = usernameInput.value.trim();
@@ -103,7 +104,7 @@
       startBtn.disabled = true;
       usernameInput.disabled = true;
 
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       mediaRecorder = new MediaRecorder(stream);
       chunks = [];
 
@@ -120,6 +121,7 @@
         const filename = `${username}_${Date.now()}.webm`;
         const ref = storage.ref().child(`reacoes/${filename}`);
 
+        stream.getTracks().forEach(track => track.stop());
          preview.srcObject = null;
          preview.style.display = 'none';
 
