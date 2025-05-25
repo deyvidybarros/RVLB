@@ -15,6 +15,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <style>
+    html, body {
+      overflow: hidden;
+      height: 100%;
+    }
     @keyframes float {
       0% { transform: translateY(0px); }
       50% { transform: translateY(-10px); }
@@ -78,9 +82,9 @@
   </style>
 </head>
 
-<body class="min-h-screen bg-gradient-to-br from-pink-50 to-blue-50 font-['Poppins']">
+<body class="h-full min-h-screen bg-gradient-to-br from-pink-50 to-blue-50 font-['Poppins'] overflow-hidden">
   <!-- Welcome Screen -->
-  <div id="welcomeScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 text-center">
+  <div id="welcomeScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 text-center h-full">
     <div class="w-full max-w-md mx-auto bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
       <div class="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-pink-200 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
         <i class="fas fa-heart text-2xl md:text-3xl text-pink-500"></i>
@@ -109,7 +113,7 @@
   </div>
 
   <!-- Main App (initially hidden) -->
-  <div id="mainApp" class="container mx-auto px-4 py-8 md:py-12 max-w-2xl hidden">
+  <div id="mainApp" class="container mx-auto px-4 py-8 md:py-12 max-w-2xl h-full hidden overflow-y-auto">
     <div class="relative mb-8 md:mb-12">
       <div class="absolute -top-8 -left-6 md:-top-10 md:-left-8 w-16 h-16 md:w-24 md:h-24 rounded-full bg-pink-200/50 opacity-70"></div>
       <div class="absolute -bottom-6 -right-6 md:-bottom-8 md:-right-8 w-20 h-20 md:w-32 md:h-32 rounded-full bg-blue-200/50 opacity-70"></div>
@@ -180,11 +184,28 @@
       </div>
     </div>
 
+    <!-- Uploading overlay -->
+    <div id="uploading" class="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-pink-50 to-blue-50 z-50 hidden">
+      <div class="text-center fade-in w-full max-w-xs md:max-w-md mx-4">
+        <div class="bg-white/90 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-sm border border-white/20">
+          <div class="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-pink-200 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-md">
+            <i class="fas fa-cloud-upload-alt text-3xl md:text-5xl text-white"></i>
+          </div>
+          <h2 class="text-2xl md:text-3xl font-bold text-neutral-700 mb-3 md:mb-4">Aguarde um momento...</h2>
+          <p class="text-sm md:text-base text-neutral-500 mb-4 md:mb-6">Estamos enviando seu vídeo cheio de amor!</p>
+          <div class="w-12 h-1 md:w-16 md:h-1 bg-gradient-to-r from-pink-400 to-blue-400 rounded-full mx-auto mb-4 md:mb-6"></div>
+          <div class="flex justify-center">
+            <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-pink-500"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Camera preview - Mobile optimized -->
-    <div class="fixed bottom-4 right-4 z-50 hidden" id="cameraContainer">
+    <div class="fixed bottom-6 right-6 z-50 hidden" id="cameraContainer">
       <div class="relative">
-        <video id="cameraPreview" autoplay muted playsinline class="w-16 h-16 md:w-20 md:h-20 object-cover rounded-full border-2 border-white shadow-lg"></video>
-        <div class="absolute bottom-0 right-0 w-3 h-3 md:w-4 md:h-4 bg-green-500 rounded-full pulse-green border-2 border-white"></div>
+        <video id="cameraPreview" autoplay muted playsinline class="w-24 h-24 md:w-32 md:h-32 object-cover rounded-full border-2 border-white shadow-lg"></video>
+        <div class="absolute bottom-0 right-0 w-4 h-4 md:w-5 md:h-5 bg-green-500 rounded-full pulse-green border-2 border-white"></div>
       </div>
     </div>
   </div>
@@ -211,7 +232,9 @@
     const usernameInput = document.getElementById('username');
     const countdown = document.getElementById('countdown');
     const reveal = document.getElementById('reveal');
+    const uploading = document.getElementById('uploading');
     const cameraContainer = document.getElementById('cameraContainer');
+    const cameraPreview = document.getElementById('cameraPreview');
 
     let mediaRecorder;
     let chunks = [];
@@ -224,8 +247,8 @@
       
       // Small delay for better transition
       setTimeout(() => {
-        document.body.scrollTop = 0; // For Safari
-        document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
       }, 100);
     });
 
@@ -266,8 +289,7 @@
         mediaRecorder = new MediaRecorder(stream);
         chunks = [];
 
-        const preview = document.getElementById('cameraPreview');
-        preview.srcObject = stream;
+        cameraPreview.srcObject = stream;
         cameraContainer.style.display = 'block';
 
         mediaRecorder.ondataavailable = e => {
@@ -275,19 +297,29 @@
         };
 
         mediaRecorder.onstop = async () => {
+          // Show uploading message
+          reveal.style.display = 'none';
+          uploading.style.display = 'flex';
+          
           const blob = new Blob(chunks, { type: 'video/webm' });
           const filename = `${username}_${Date.now()}.webm`;
           const ref = storage.ref().child(`reacoes/${filename}`);
 
-          stream.getTracks().forEach(track => track.stop());
-          preview.srcObject = null;
+          // Stop all tracks
+          if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+          }
+          
+          cameraPreview.srcObject = null;
           cameraContainer.style.display = 'none';
 
           try {
             await ref.put(blob);
+            uploading.style.display = 'none';
             showNotification("Obrigado por compartilhar sua alegria comigo! Guardei seu vídeo com muito carinho 💖", "success");
           } catch (err) {
-            showNotification("Ops! Algo deu errado ao guardar seu vídeo: " + err, "error");
+            uploading.style.display = 'none';
+            showNotification("Ops! Algo deu errado ao guardar seu vídeo: " + err.message, "error");
           }
         };
 
@@ -298,9 +330,12 @@
         revealName(); // Show baby name
         await wait(10000); // Record 10 more seconds after reveal
 
-        mediaRecorder.stop();
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+          mediaRecorder.stop();
+        }
         resetUI();
       } catch (err) {
+        console.error("Error in recording process:", err);
         showNotification("Eita! Não consegui acessar sua câmera. Será que você pode me dar permissão? 😊", "error");
         resetUI();
       }
@@ -328,7 +363,7 @@
           angle: 120,
           spread: 55,
           origin: { x: 1 },
-          colors: ['#f43f5e', '#f97316', '#eab308', '#22c55e', '#3b82f6, #a855f7', '#ec4899']
+          colors: ['#f43f5e', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#a855f7', '#ec4899']
         });
       }, 300);
     }
@@ -386,6 +421,16 @@
         welcomeScreen.classList.remove('hidden');
         mainApp.classList.add('hidden');
         history.pushState(null, null, window.location.href);
+      }
+    });
+
+    // Clean up on page unload
+    window.addEventListener('beforeunload', () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
       }
     });
   </script>
