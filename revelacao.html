@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Revelação do Bebê</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+  
+  <!-- Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #fff0f5;
+      padding: 20px;
+    }
+    input, button {
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      margin: 10px;
+    }
+    #countdown {
+      font-size: 48px;
+      margin-top: 20px;
+      display: none;
+    }
+    #reveal {
+      font-size: 32px;
+      color: #e91e63;
+      margin-top: 20px;
+      display: none;
+      animation: fadeIn 2s ease-in-out forwards;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Descubra o nome do bebê! 💖</h2>
+
+  <input id="username" type="text" placeholder="Digite seu nome" />
+  <br>
+  <button id="startBtn">Revelar</button>
+
+  <div id="countdown"></div>
+  <div id="reveal">É a Maria Clara! 👶🎉</div>
+
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDkmOEaP4gFhXoW6dBWqKRxgOgjEHqhCXs",
+      authDomain: "rvlb-12aa8.firebaseapp.com",
+      projectId: "rvlb-12aa8",
+      storageBucket: "rvlb-12aa8.appspot.com",
+      messagingSenderId: "896005516542",
+      appId: "1:896005516542:web:ea64faf957d1cbaeb6c9af",
+      measurementId: "G-YHRLW2R3VJ"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const storage = firebase.storage();
+
+    const startBtn = document.getElementById('startBtn');
+    const usernameInput = document.getElementById('username');
+    const countdown = document.getElementById('countdown');
+    const reveal = document.getElementById('reveal');
+
+    let mediaRecorder;
+    let chunks = [];
+
+    async function startProcess() {
+      const username = usernameInput.value.trim();
+      if (!username) {
+        alert("Digite seu nome antes de continuar.");
+        return;
+      }
+
+      startBtn.disabled = true;
+      usernameInput.disabled = true;
+
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      chunks = [];
+
+      mediaRecorder.ondataavailable = e => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = async () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const filename = `${username}_${Date.now()}.webm`;
+        const ref = storage.ref().child(`reacoes/${filename}`);
+        try {
+          await ref.put(blob);
+          alert("Reação gravada e enviada com sucesso! Obrigado 💖");
+        } catch (err) {
+          alert("Erro ao enviar vídeo: " + err);
+        }
+      };
+
+      mediaRecorder.start();
+
+      await startCountdown(5); // 5s de contagem inicial
+      revealName(); // Mostrar nome
+      await wait(30000); // Gravar mais 30s depois da revelação
+
+      mediaRecorder.stop();
+    }
+
+    function revealName() {
+      reveal.style.display = 'block';
+      confetti({
+        particleCount: 200,
+        spread: 90,
+        origin: { y: 0.6 }
+      });
+    }
+
+    function startCountdown(seconds) {
+      return new Promise(resolve => {
+        countdown.style.display = 'block';
+        let counter = seconds;
+        countdown.innerText = counter;
+        const interval = setInterval(() => {
+          counter--;
+          countdown.innerText = counter;
+          if (counter <= 0) {
+            clearInterval(interval);
+            countdown.style.display = 'none';
+            resolve();
+          }
+        }, 1000);
+      });
+    }
+
+    function wait(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    startBtn.addEventListener('click', startProcess);
+  </script>
+</body>
+</html>
