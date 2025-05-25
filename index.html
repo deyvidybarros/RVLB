@@ -62,7 +62,7 @@
 
   <h2>Descubra o nome do bebê! 💖</h2>
   </br>
-  <h4>Aguarde a mensagem de video enviado! v1</h4>
+  <h4>Aguarde a mensagem de video enviado! v2</h4>
 
   <input id="username" type="text" placeholder="Digite seu nome" />
   <br>
@@ -119,11 +119,13 @@
         const blob = new Blob(chunks, { type: 'video/webm' });
         const filename = `${username}_${Date.now()}.webm`;
         const ref = storage.ref().child(`reacoes/${filename}`);
+
+         preview.srcObject = null;
+         preview.style.display = 'none';
+
         try {
           await ref.put(blob);
-          alert("Reação gravada e enviada com sucesso! Obrigado 💖");
-          preview.srcObject = null;
-          preview.style.display = 'none';
+          alert("Reação gravada e enviada com sucesso! Obrigado 💖");       
         } catch (err) {
           alert("Erro ao enviar vídeo: " + err);
         }
