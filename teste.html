@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Memórias do Bebê</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+      max-width: 100%;
+      height: 100%;
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+    .floating {
+      animation: float 4s ease-in-out infinite;
+    }
+    .rainbow-gradient {
+      background: linear-gradient(45deg, #f43f5e, #f97316, #eab308, #22c55e, #3b82f6, #a855f7, #ec4899);
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+    }
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .video-modal-container {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0,0,0,0.9);
+      z-index: 50;
+      padding: 1rem;
+    }
+    .video-modal {
+      width: 90%;
+      max-width: 800px;
+      background: white;
+      border-radius: 1rem;
+      overflow: hidden;
+      position: relative;
+    }
+    .video-modal video {
+      width: 100%;
+      display: block;
+    }
+    .close-modal-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 2rem;
+      height: 2rem;
+      background: rgba(255,255,255,0.8);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #4b5563;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.2s;
+    }
+    .close-modal-btn:hover {
+      background: white;
+      transform: scale(1.1);
+    }
+    
+    @media (max-width: 640px) {
+      .text-8xl { font-size: 5rem; }
+      .text-7xl { font-size: 4rem; }
+      .text-6xl { font-size: 3rem; }
+      .text-5xl { font-size: 2.5rem; }
+      .text-4xl { font-size: 2rem; }
+      .text-3xl { font-size: 1.75rem; }
+      .text-2xl { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+
+<body class="min-w-0 max-w-full overflow-x-hidden min-h-screen bg-gradient-to-br from-pink-50 to-blue-50 font-['Poppins']">
+  <div class="container mx-auto px-4 py-8 md:py-12 max-w-4xl h-full overflow-y-auto overflow-x-hidden">
+    <!-- Cabeçalho -->
+    <div class="relative mb-8 md:mb-12">
+      <div class="absolute -top-8 -left-6 md:-top-10 md:-left-8 w-16 h-16 md:w-24 md:h-24 rounded-full bg-pink-200/50 opacity-70"></div>
+      <div class="absolute -bottom-6 -right-6 md:-bottom-8 md:-right-8 w-20 h-20 md:w-32 md:h-32 rounded-full bg-blue-200/50 opacity-70"></div>
+      
+      <div class="relative z-10 text-center">
+        <h1 class="text-3xl md:text-5xl font-bold text-neutral-700 mb-2">Memórias do Nosso Bebê</h1>
+        <p class="text-base md:text-lg text-neutral-500">Relembre todos os momentos especiais!</p>
+      </div>
+    </div>
+
+    <!-- Seção do Bebê -->
+    <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm p-6 md:p-8 relative overflow-hidden border border-white/20 mb-8">
+      <div class="absolute -top-16 -right-16 md:-top-20 md:-right-20 w-32 h-32 md:w-40 md:h-40 rounded-full bg-pink-100/50"></div>
+      <div class="absolute -bottom-16 -left-16 md:-bottom-20 md:-left-20 w-32 h-32 md:w-40 md:h-40 rounded-full bg-blue-100/50"></div>
+      
+      <div class="relative z-10">
+        <div class="flex justify-center mb-6">
+          <div class="relative floating">
+            <div class="w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-pink-200 to-blue-200 rounded-full flex items-center justify-center shadow-md">
+              <i class="fas fa-baby text-4xl md:text-6xl text-white"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mb-6">
+          <h2 class="text-xl md:text-2xl font-semibold text-neutral-700 mb-2">Reações Cheias de Amor</h2>
+          <p class="text-sm md:text-base text-neutral-500">Veja abaixo todas as reações gravadas pelos nossos queridos!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de Vídeos -->
+    <div id="videosContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      <div class="text-center py-8">
+        <i class="fas fa-spinner fa-spin text-2xl text-pink-400"></i>
+        <p class="mt-2 text-neutral-500">Carregando memórias especiais...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Vídeo -->
+  <div id="videoModal" class="video-modal-container hidden">
+    <div class="video-modal">
+      <button id="closeModal" class="close-modal-btn">
+        <i class="fas fa-times"></i>
+      </button>
+      <video id="modalVideo" controls class="w-full" src=""></video>
+      <div id="unsupportedMessage" class="hidden p-4 text-center">
+        <i class="fas fa-exclamation-triangle text-4xl text-yellow-500 mb-3"></i>
+        <h3 class="text-xl font-bold mb-2">Formato não suportado</h3>
+        <p class="mb-4">Seu navegador não consegue reproduzir vídeos no formato WEBM.</p>
+        <a id="downloadVideo" class="inline-block bg-pink-500 hover:bg-pink-600 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+          <i class="fas fa-download mr-2"></i>Baixar Vídeo
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDkmOEaP4gFhXoW6dBWqKRxgOgjEHqhCXs",
+      authDomain: "rvlb-12aa8.firebaseapp.com",
+      projectId: "rvlb-12aa8",
+      storageBucket: "rvlb-12aa8.firebasestorage.app",
+      messagingSenderId: "896005516542",
+      appId: "1:896005516542:web:ea64faf957d1cbaeb6c9af",
+      measurementId: "G-YHRLW2R3VJ"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const storage = firebase.storage();
+
+    // Elementos
+    const videosContainer = document.getElementById('videosContainer');
+    const videoModal = document.getElementById('videoModal');
+    const modalVideo = document.getElementById('modalVideo');
+    const closeModal = document.getElementById('closeModal');
+    const unsupportedMessage = document.getElementById('unsupportedMessage');
+    const downloadVideo = document.getElementById('downloadVideo');
+
+    // Verificar suporte a WEBM
+    function supportsWebM() {
+      const elem = document.createElement('video');
+      return elem.canPlayType('video/webm').replace('no', '');
+    }
+
+    // Carregar vídeos
+    document.addEventListener('DOMContentLoaded', loadVideos);
+
+    async function loadVideos() {
+      try {
+        const storageRef = storage.ref('reacoes');
+        const result = await storageRef.listAll();
+        
+        videosContainer.innerHTML = '';
+        
+        if (result.items.length === 0) {
+          videosContainer.innerHTML = `
+            <div class="col-span-full text-center py-8">
+              <i class="fas fa-heart-broken text-2xl text-pink-400"></i>
+              <p class="mt-2 text-neutral-500">Nenhuma memória foi gravada ainda...</p>
+            </div>
+          `;
+          return;
+        }
+
+        const items = await Promise.all(result.items.map(async (item) => {
+          const metadata = await item.getMetadata();
+          return {
+            name: item.name,
+            timeCreated: metadata.timeCreated,
+            url: await item.getDownloadURL(),
+            contentType: metadata.contentType
+          };
+        }));
+
+        items.sort((a, b) => new Date(b.timeCreated) - new Date(a.timeCreated));
+
+        const webmSupported = supportsWebM();
+        
+        items.forEach((item) => {
+          const userName = item.name.split('_')[0];
+          const date = new Date(item.timeCreated).toLocaleDateString('pt-BR');
+          const isWebM = item.contentType === 'video/webm';
+          
+          const videoCard = document.createElement('div');
+          videoCard.className = 'bg-white/90 backdrop-blur-sm rounded-xl shadow-sm p-4 border border-white/20 hover:shadow-md transition-all';
+          videoCard.innerHTML = `
+            <div class="relative pb-[56.25%] bg-black rounded-lg overflow-hidden mb-3">
+              <video 
+                class="absolute top-0 left-0 w-full h-full object-cover" 
+                ${isWebM && !webmSupported ? '' : 'controls'}
+                playsinline
+                preload="metadata"
+                webkit-playsinline
+                ${isWebM && !webmSupported ? 'poster="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'800\' height=\'600\' viewBox=\'0 0 800 600\'%3E%3Crect fill=\'%23f3f4f6\' width=\'800\' height=\'600\'/%3E%3Ctext fill=\'%239ca3af\' font-family=\'Poppins\' font-size=\'40\' font-weight=\'bold\' x=\'50%\' y=\'50%\' dominant-baseline=\'middle\' text-anchor=\'middle\'%3EFormato WEBM%3C/text%3E%3C/svg%3E"' : ''}
+                ${isWebM && !webmSupported ? '' : `src="${item.url}"`}>
+              </video>
+              ${isWebM && !webmSupported ? `
+                <div class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center bg-black/70">
+                  <i class="fas fa-exclamation-triangle text-3xl text-yellow-500 mb-2"></i>
+                  <p class="text-white font-medium">Formato WEBM</p>
+                  <p class="text-white/80 text-sm mt-1">Clique para tentar reproduzir</p>
+                </div>
+              ` : `
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <button class="video-play-btn w-12 h-12 md:w-16 md:h-16 bg-white/80 rounded-full flex items-center justify-center text-pink-500 hover:bg-white transition-all transform hover:scale-110">
+                    <i class="fas fa-play text-xl md:text-2xl"></i>
+                  </button>
+                </div>
+              `}
+            </div>
+            <h4 class="font-medium text-neutral-700 truncate">${userName}</h4>
+            <p class="text-xs text-neutral-400">${date}</p>
+          `;
+          
+          const videoElement = videoCard.querySelector('video');
+          const playBtn = videoCard.querySelector('.video-play-btn');
+          
+          if (isWebM && !webmSupported) {
+            // Para navegadores sem suporte a WEBM
+            videoCard.addEventListener('click', () => {
+              modalVideo.src = item.url;
+              videoModal.classList.remove('hidden');
+              document.body.style.overflow = 'hidden';
+              unsupportedMessage.classList.remove('hidden');
+              modalVideo.classList.add('hidden');
+              downloadVideo.href = item.url;
+              downloadVideo.download = item.name;
+              
+              // Tentar reproduzir mesmo assim (alguns navegadores podem conseguir)
+              modalVideo.load();
+              modalVideo.play().catch(e => {
+                console.log("Falha ao reproduzir WEBM");
+              });
+            });
+          } else {
+            // Para navegadores com suporte a WEBM
+            if (playBtn) {
+              playBtn.addEventListener('click', () => {
+                modalVideo.src = item.url;
+                videoModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                unsupportedMessage.classList.add('hidden');
+                modalVideo.classList.remove('hidden');
+                modalVideo.play().catch(e => {
+                  console.log("Autoplay prevented, showing controls");
+                  modalVideo.controls = true;
+                });
+              });
+            }
+          }
+          
+          videosContainer.appendChild(videoCard);
+        });
+
+      } catch (error) {
+        console.error("Erro ao carregar vídeos:", error);
+        videosContainer.innerHTML = `
+          <div class="col-span-full text-center py-8">
+            <i class="fas fa-exclamation-triangle text-2xl text-pink-400"></i>
+            <p class="mt-2 text-neutral-500">Ocorreu um erro ao carregar as memórias</p>
+          </div>
+        `;
+      }
+    }
+
+    // Fechar modal
+    closeModal.addEventListener('click', () => {
+      modalVideo.pause();
+      videoModal.classList.add('hidden');
+      document.body.style.overflow = '';
+      unsupportedMessage.classList.add('hidden');
+      modalVideo.classList.remove('hidden');
+    });
+
+    // Fechar ao clicar fora
+    videoModal.addEventListener('click', (e) => {
+      if (e.target === videoModal) {
+        modalVideo.pause();
+        videoModal.classList.add('hidden');
+        document.body.style.overflow = '';
+        unsupportedMessage.classList.add('hidden');
+        modalVideo.classList.remove('hidden');
+      }
+    });
+  </script>
+</body>
+</html>
