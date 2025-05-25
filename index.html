@@ -38,12 +38,26 @@
       display: none;
       animation: fadeIn 2s ease-in-out forwards;
     }
+    #cameraPreview {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 4px solid #4CAF50; /* Verde de gravação */
+      box-shadow: 0 0 12px 2px #4CAF50;
+      z-index: 9999;
+      display: none;
+    }
     @keyframes fadeIn {
       0% { opacity: 0; transform: scale(0.8); }
       100% { opacity: 1; transform: scale(1); }
     }
   </style>
 </head>
+
 <body>
 
   <h2>Descubra o nome do bebê! 💖</h2>
@@ -93,6 +107,10 @@
       mediaRecorder = new MediaRecorder(stream);
       chunks = [];
 
+      const preview = document.getElementById('cameraPreview');
+      preview.srcObject = stream;
+      preview.style.display = 'block';
+
       mediaRecorder.ondataavailable = e => {
         if (e.data.size > 0) chunks.push(e.data);
       };
@@ -104,6 +122,8 @@
         try {
           await ref.put(blob);
           alert("Reação gravada e enviada com sucesso! Obrigado 💖");
+          preview.srcObject = null;
+          preview.style.display = 'none';
         } catch (err) {
           alert("Erro ao enviar vídeo: " + err);
         }
@@ -150,5 +170,8 @@
 
     startBtn.addEventListener('click', startProcess);
   </script>
+
+  <video id="cameraPreview" autoplay muted playsinline></video>
+
 </body>
 </html>
