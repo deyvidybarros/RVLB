@@ -97,13 +97,13 @@
         <p class="text-sm md:text-base text-neutral-600"><i class="fas fa-info-circle text-purple-400 mr-2"></i> Após aceitar, sua câmera será ativada para gravar:</p>
         <ul class="list-disc pl-4 mt-2 text-xs md:text-sm text-neutral-600">
           <li class="mb-1 md:mb-2">Uma contagem regressiva emocionante</li>
-          <li class="mb-1 md:mb-2">A revelação do nosso pequeno tesouro</li>
+          <li class="mb-1 md:mb-2">A revelação do nosso pequeno(a) tesouro</li>
           <li>Seus momentos de felicidade e surpresa</li>
         </ul>
       </div>
       
       <div class="mb-4 md:mb-6 p-3 md:p-4 bg-gradient-to-r from-pink-100 to-blue-100 rounded-lg border border-white/30">
-        <p class="text-sm md:text-base text-pink-600 font-medium italic">"Oi gente! Sou eu, o bebê! Estou tão ansioso para vocês descobrirem quem eu sou! Vamos brincar de adivinhação? Digam meu nome e gravem suas carinhas de surpresa!"</p>
+        <p class="text-sm md:text-base text-pink-600 font-medium italic">"Oi gente! Sou eu, o bebê! Estou tão ansioso para vocês descobrirem quem eu sou! Vamos brincar de adivinhação? Digam seus nomes e gravem suas carinhas de surpresa!"</p>
       </div>
       
       <button id="continueBtn" class="w-full rainbow-gradient hover:opacity-90 text-white font-medium py-2 md:py-3 px-4 md:px-6 rounded-lg shadow transition-all duration-300 transform hover:scale-[1.02] text-sm md:text-base">
@@ -163,63 +163,90 @@
         </button>
       </div>
     </div>
+  </div>
 
-    <!-- Countdown overlay -->
-    <div id="countdown" class="fixed inset-0 flex items-center justify-center bg-black/90 z-50 hidden">
-      <div class="text-white text-6xl md:text-8xl font-bold animate-pulse rainbow-gradient bg-clip-text text-transparent">5</div>
+  <!-- Countdown overlay -->
+  <div id="countdown" class="fixed inset-0 flex items-center justify-center bg-black/90 z-50 hidden">
+    <div class="text-white text-6xl md:text-8xl font-bold animate-pulse rainbow-gradient bg-clip-text text-transparent">5</div>
+  </div>
+
+  <!-- Reveal overlay -->
+  <div id="reveal" class="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-pink-50 to-blue-50 z-50 hidden">
+    <div class="text-center fade-in w-full max-w-xs md:max-w-md mx-4">
+      <div class="bg-white/90 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-sm border border-white/20">
+        <div class="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-pink-200 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-md">
+          <i class="fas fa-baby text-3xl md:text-5xl text-white"></i>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text rainbow-gradient mb-3 md:mb-4">É UM TESTE! 👶🎉</h2>
+        <p class="text-sm md:text-base text-neutral-500 mb-4 md:mb-6">Obrigado por fazer parte dessa revelação tão especial!</p>
+        <div class="w-12 h-1 md:w-16 md:h-1 bg-gradient-to-r from-pink-400 to-blue-400 rounded-full mx-auto mb-4 md:mb-6"></div>
+        <p class="text-xs md:text-sm text-neutral-400"><i class="fas fa-smile-beam text-yellow-400 mr-2"></i>Gravando seu sorriso por mais alguns segundos...</p>
+      </div>
     </div>
+  </div>
 
-    <!-- Reveal overlay -->
-    <div id="reveal" class="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-pink-50 to-blue-50 z-50 hidden">
-      <div class="text-center fade-in w-full max-w-xs md:max-w-md mx-4">
-        <div class="bg-white/90 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-sm border border-white/20">
-          <div class="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-pink-200 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-md">
-            <i class="fas fa-baby text-3xl md:text-5xl text-white"></i>
-          </div>
-          <h2 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text rainbow-gradient mb-3 md:mb-4">É UM TESTE! 👶🎉</h2>
-          <p class="text-sm md:text-base text-neutral-500 mb-4 md:mb-6">Obrigado por fazer parte dessa revelação tão especial!</p>
-          <div class="w-12 h-1 md:w-16 md:h-1 bg-gradient-to-r from-pink-400 to-blue-400 rounded-full mx-auto mb-4 md:mb-6"></div>
-          <p class="text-xs md:text-sm text-neutral-400"><i class="fas fa-smile-beam text-yellow-400 mr-2"></i>Gravando seu sorriso por mais alguns segundos...</p>
+  <!-- Uploading overlay -->
+  <div id="uploading" class="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-pink-50 to-blue-50 z-50 hidden">
+    <div class="text-center fade-in w-full max-w-xs md:max-w-md mx-4">
+      <div class="bg-white/90 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-sm border border-white/20">
+        <div class="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-pink-200 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-md">
+          <i class="fas fa-cloud-upload-alt text-3xl md:text-5xl text-white"></i>
+        </div>
+        <h2 class="text-2xl md:text-3xl font-bold text-neutral-700 mb-3 md:mb-4">Aguarde um momento...</h2>
+        <p class="text-sm md:text-base text-neutral-500 mb-4 md:mb-6">Estamos enviando seu vídeo cheio de amor!</p>
+        <div class="w-12 h-1 md:w-16 md:h-1 bg-gradient-to-r from-pink-400 to-blue-400 rounded-full mx-auto mb-4 md:mb-6"></div>
+        <div class="flex justify-center">
+          <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-pink-500"></div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Uploading overlay -->
-    <div id="uploading" class="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-pink-50 to-blue-50 z-50 hidden">
-      <div class="text-center fade-in w-full max-w-xs md:max-w-md mx-4">
-        <div class="bg-white/90 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-sm border border-white/20">
-          <div class="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-pink-200 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-md">
-            <i class="fas fa-cloud-upload-alt text-3xl md:text-5xl text-white"></i>
-          </div>
-          <h2 class="text-2xl md:text-3xl font-bold text-neutral-700 mb-3 md:mb-4">Aguarde um momento...</h2>
-          <p class="text-sm md:text-base text-neutral-500 mb-4 md:mb-6">Estamos enviando seu vídeo cheio de amor!</p>
-          <div class="w-12 h-1 md:w-16 md:h-1 bg-gradient-to-r from-pink-400 to-blue-400 rounded-full mx-auto mb-4 md:mb-6"></div>
-          <div class="flex justify-center">
-            <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-pink-500"></div>
-          </div>
+  <!-- Thank You overlay (AGORA FORA DO mainApp) -->
+  <div id="thankYou" class="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-pink-50 to-blue-50 z-50 hidden">
+    <div class="text-center fade-in w-full max-w-xs md:max-w-md mx-4">
+      <div class="bg-white/90 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-sm border border-white/20">
+        <div class="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-pink-200 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-md pulse">
+          <i class="fas fa-heart text-3xl md:text-5xl text-white"></i>
         </div>
+        <h2 class="text-2xl md:text-3xl font-bold text-neutral-700 mb-3 md:mb-4">Obrigado por esse momento!</h2>
+        
+        <div class="bg-pink-50/50 p-4 rounded-lg mb-4 md:mb-6 border border-pink-100">
+          <p class="text-sm md:text-base text-neutral-600 italic mb-2">"Oiêee! Sou eu, o bebê! ❤️</p>
+          <p class="text-sm md:text-base text-neutral-600 italic mb-2">Mal posso esperar para te conhecer pessoalmente e receber muitos beijinhos e colo!</p>
+          <p class="text-sm md:text-base text-neutral-600 italic mb-2">Você nem imagina o quanto estou ansioso para brincar com você e fazer mil artes juntos, vai ser tão divertido! 😊</p>
+        </div>
+        
+        <div class="w-12 h-1 md:w-16 md:h-1 bg-gradient-to-r from-pink-400 to-blue-400 rounded-full mx-auto mb-4 md:mb-6"></div>
+        
+        <button 
+          id="restartBtn" 
+          class="w-full rainbow-gradient hover:opacity-90 text-white font-semibold py-3 px-4 md:py-3 md:px-6 rounded-lg shadow-sm hover:shadow transition-all duration-300 transform hover:scale-[1.02] text-sm md:text-base"
+        >
+          <i class="fas fa-redo mr-2"></i> Fazer de novo
+        </button>
       </div>
     </div>
+  </div>
 
-    <!-- Camera preview - Mobile optimized -->
-    <div class="fixed bottom-6 right-6 z-50 hidden" id="cameraContainer">
-      <div class="relative">
-        <video id="cameraPreview" autoplay muted playsinline class="w-24 h-24 md:w-32 md:h-32 object-cover rounded-full border-2 border-white shadow-lg"></video>
-        <div class="absolute bottom-0 right-0 w-4 h-4 md:w-5 md:h-5 bg-green-500 rounded-full pulse-green border-2 border-white"></div>
-      </div>
+  <!-- Camera preview - Mobile optimized -->
+  <div class="fixed bottom-6 right-6 z-50 hidden" id="cameraContainer">
+    <div class="relative">
+      <video id="cameraPreview" autoplay muted playsinline class="w-24 h-24 md:w-32 md:h-32 object-cover rounded-full border-2 border-white shadow-lg"></video>
+      <div class="absolute bottom-0 right-0 w-4 h-4 md:w-5 md:h-5 bg-green-500 rounded-full pulse-green border-2 border-white"></div>
     </div>
   </div>
 
   <script>
     // Firebase config
     const firebaseConfig = {
-    apiKey: "AIzaSyDkmOEaP4gFhXoW6dBWqKRxgOgjEHqhCXs",
-    authDomain: "rvlb-12aa8.firebaseapp.com",
-    projectId: "rvlb-12aa8",
-    storageBucket: "rvlb-12aa8.firebasestorage.app",
-    messagingSenderId: "896005516542",
-    appId: "1:896005516542:web:ea64faf957d1cbaeb6c9af",
-    measurementId: "G-YHRLW2R3VJ"
+      apiKey: "AIzaSyDkmOEaP4gFhXoW6dBWqKRxgOgjEHqhCXs",
+      authDomain: "rvlb-12aa8.firebaseapp.com",
+      projectId: "rvlb-12aa8",
+      storageBucket: "rvlb-12aa8.firebasestorage.app",
+      messagingSenderId: "896005516542",
+      appId: "1:896005516542:web:ea64faf957d1cbaeb6c9af",
+      measurementId: "G-YHRLW2R3VJ"
     };
     
     firebase.initializeApp(firebaseConfig);
@@ -229,10 +256,12 @@
     const mainApp = document.getElementById('mainApp');
     const continueBtn = document.getElementById('continueBtn');
     const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
     const usernameInput = document.getElementById('username');
     const countdown = document.getElementById('countdown');
     const reveal = document.getElementById('reveal');
     const uploading = document.getElementById('uploading');
+    const thankYou = document.getElementById('thankYou');
     const cameraContainer = document.getElementById('cameraContainer');
     const cameraPreview = document.getElementById('cameraPreview');
 
@@ -250,6 +279,16 @@
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
       }, 100);
+    });
+
+    // Restart process
+    restartBtn.addEventListener('click', () => {
+      thankYou.classList.add('hidden');
+      mainApp.classList.remove('hidden');
+      resetUI();
+      
+      // Rolar para o topo
+      window.scrollTo(0, 0);
     });
 
     async function startProcess() {
@@ -316,10 +355,21 @@
           try {
             await ref.put(blob);
             uploading.style.display = 'none';
-            showNotification("Obrigado por compartilhar sua alegria comigo! Guardei seu vídeo com muito carinho 💖", "success");
+            mainApp.classList.add('hidden'); // Esconde o mainApp
+            thankYou.style.display = 'flex'; // Mostra a tela de agradecimento
+            
+            // Confetti celebration
+            confetti({
+              particleCount: 100,
+              spread: 70,
+              origin: { y: 0.6 },
+              colors: ['#f43f5e', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#a855f7', '#ec4899']
+            });
+            
           } catch (err) {
             uploading.style.display = 'none';
             showNotification("Ops! Algo deu errado ao guardar seu vídeo: " + err.message, "error");
+            resetUI();
           }
         };
 
@@ -333,7 +383,6 @@
         if (mediaRecorder && mediaRecorder.state !== 'inactive') {
           mediaRecorder.stop();
         }
-        resetUI();
       } catch (err) {
         console.error("Error in recording process:", err);
         showNotification("Eita! Não consegui acessar sua câmera. Será que você pode me dar permissão? 😊", "error");
