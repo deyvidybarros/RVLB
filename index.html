@@ -1,59 +1,53 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Revelação do Bebê</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
-  
-  <!-- Confetti -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      background: #fff0f5;
+      background: #fffbe6;
       padding: 20px;
+    }
+    #startContainer, #revealContainer {
+      margin-top: 100px;
     }
     input, button {
       padding: 12px;
-      font-size: 16px;
+      font-size: 18px;
       border-radius: 8px;
       border: none;
       margin: 10px;
     }
-    #countdown {
-      font-size: 48px;
-      margin-top: 20px;
-      display: none;
-    }
-    #reveal {
-      font-size: 32px;
-      color: #e91e63;
-      margin-top: 20px;
-      display: none;
-      animation: fadeIn 2s ease-in-out forwards;
+    #revealMessage {
+      font-size: 28px;
+      font-weight: bold;
+      margin-top: 30px;
+      animation: fadeIn 2s ease-in-out;
     }
     @keyframes fadeIn {
-      0% { opacity: 0; transform: scale(0.8); }
-      100% { opacity: 1; transform: scale(1); }
+      from {opacity: 0;}
+      to {opacity: 1;}
     }
   </style>
 </head>
 <body>
 
-  <h2>Descubra o nome do bebê! 💖</h2>
+  <div id="startContainer">
+    <h2>Digite seu nome para ver a revelação 🎉</h2>
+    <input type="text" id="username" placeholder="Seu nome" />
+    <button onclick="startReveal()">Ver Revelação</button>
+  </div>
 
-  <input id="username" type="text" placeholder="Digite seu nome" />
-  <br>
-  <button id="startBtn">Revelar</button>
-
-  <div id="countdown"></div>
-  <div id="reveal">É a Maria Clara! 👶🎉</div>
+  <div id="revealContainer" style="display:none;">
+    <h2 id="countdown">Preparando...</h2>
+    <div id="revealMessage" style="display:none;">É uma MENINA! 💖</div>
+  </div>
 
   <script>
     // Firebase config
@@ -69,84 +63,98 @@
     firebase.initializeApp(firebaseConfig);
     const storage = firebase.storage();
 
-    const startBtn = document.getElementById('startBtn');
-    const usernameInput = document.getElementById('username');
-    const countdown = document.getElementById('countdown');
-    const reveal = document.getElementById('reveal');
-
-    let mediaRecorder;
-    let chunks = [];
-
-    async function startProcess() {
-      const username = usernameInput.value.trim();
+    async function startReveal() {
+      const username = document.getElementById("username").value.trim();
       if (!username) {
-        alert("Digite seu nome antes de continuar.");
+        alert("Digite seu nome antes!");
         return;
       }
 
-      startBtn.disabled = true;
-      usernameInput.disabled = true;
+      document.getElementById("startContainer").style.display = "none";
+      document.getElementById("revealContainer").style.display = "block";
 
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      mediaRecorder = new MediaRecorder(stream);
-      chunks = [];
+      // Solicita permissão e inicia a câmera
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      } catch (err) {
+        alert("Permita o uso da câmera e microfone para continuar.");
+        return;
+      }
 
-      mediaRecorder.ondataavailable = e => {
-        if (e.data.size > 0) chunks.push(e.data);
-      };
+      const chunks = [];
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = e => chunks.push(e.data);
 
       mediaRecorder.onstop = async () => {
         const blob = new Blob(chunks, { type: 'video/webm' });
         const filename = `${username}_${Date.now()}.webm`;
         const ref = storage.ref().child(`reacoes/${filename}`);
+
+        // Desliga a câmera e microfone
+        stream.getTracks().forEach(track => track.stop());
+
         try {
           await ref.put(blob);
           alert("Reação gravada e enviada com sucesso! Obrigado 💖");
         } catch (err) {
-          alert("Erro ao enviar vídeo: " + err);
+          alert("Erro ao enviar vídeo: " + err.message);
         }
       };
 
       mediaRecorder.start();
 
-      await startCountdown(5); // 5s de contagem inicial
-      revealName(); // Mostrar nome
-      await wait(30000); // Gravar mais 30s depois da revelação
+      // Contagem regressiva
+      let seconds = 5;
+      const countdownEl = document.getElementById("countdown");
+      const interval = setInterval(() => {
+        countdownEl.textContent = `Revelação em ${seconds}...`;
+        seconds--;
+        if (seconds < 0) {
+          clearInterval(interval);
+          showReveal();
+        }
+      }, 1000);
 
-      mediaRecorder.stop();
+      // Mostra a revelação
+      function showReveal() {
+        document.getElementById("countdown").style.display = "none";
+        const revealEl = document.getElementById("revealMessage");
+        revealEl.style.display = "block";
+        confetti(); // 🎉 efeito visual
+        // Grava +30 segundos após revelação
+        setTimeout(() => {
+          mediaRecorder.stop();
+        }, 30000);
+      }
     }
 
-    function revealName() {
-      reveal.style.display = 'block';
-      confetti({
-        particleCount: 200,
-        spread: 90,
-        origin: { y: 0.6 }
-      });
+    function confetti() {
+      const duration = 3 * 1000;
+      const end = Date.now() + duration;
+
+      (function frame() {
+        confettiLib({
+          particleCount: 4,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 }
+        });
+        confettiLib({
+          particleCount: 4,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 }
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      })();
     }
 
-    function startCountdown(seconds) {
-      return new Promise(resolve => {
-        countdown.style.display = 'block';
-        let counter = seconds;
-        countdown.innerText = counter;
-        const interval = setInterval(() => {
-          counter--;
-          countdown.innerText = counter;
-          if (counter <= 0) {
-            clearInterval(interval);
-            countdown.style.display = 'none';
-            resolve();
-          }
-        }, 1000);
-      });
-    }
-
-    function wait(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    startBtn.addEventListener('click', startProcess);
+    // Alias global p/ confetti
+    const confettiLib = window.confetti;
   </script>
 </body>
 </html>
