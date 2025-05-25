@@ -283,12 +283,13 @@
 
     // Restart process
     restartBtn.addEventListener('click', () => {
-      thankYou.classList.add('hidden');
-      mainApp.classList.remove('hidden');
-      resetUI();
+       // thankYou.classList.add('hidden');
+      // mainApp.classList.remove('hidden');
+      // resetUI();
       
-      // Rolar para o topo
-      window.scrollTo(0, 0);
+      // // Rolar para o topo
+      // window.scrollTo(0, 0);
+      location.reload();
     });
 
     async function startProcess() {
